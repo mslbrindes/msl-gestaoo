@@ -74,7 +74,7 @@
         <form id="formFin">
             <select id="fTipo"><option value="Entrada">Entrada</option><option value="Saída">Saída</option></select>
             <input type="text" id="fDesc" placeholder="Descrição" required>
-            <input type="number" id="fVal" step="0.01" placeholder="Valor (R$)" required>
+            <input type="text" id="fVal" placeholder="Valor (ex: 150.00)" required>
             <button type="submit" class="btn-add">Adicionar</button>
         </form>
         <table>
@@ -88,7 +88,7 @@
         <h2>Gerador de Cobrança (Pix & Boleto)</h2>
         <form id="formCob">
             <input type="text" id="cCliente" placeholder="Nome do Cliente" required>
-            <input type="number" id="cValor" step="0.01" placeholder="Valor da Cobrança (R$)" required>
+            <input type="text" id="cValor" placeholder="Valor da Cobrança (ex: 350.00)" required>
             <input type="text" id="cChavePix" placeholder="Sua Chave Pix (CNPJ, CPF ou E-mail)" value="66.501.064/0001-84" required>
             <input type="text" id="cBoletoLink" placeholder="Link do Boleto (opcional)">
             <button type="submit" class="btn-add">Gerar Pix & Resumo</button>
@@ -109,8 +109,8 @@
         <form id="formPed">
             <input type="text" id="pCliente" placeholder="Nome do Cliente" required>
             <input type="text" id="pBrinde" placeholder="Descrição do Brinde" required>
-            <input type="number" id="pQtd" placeholder="Quantidade" required>
-            <input type="number" id="pTotal" step="0.01" placeholder="Valor Total (R$)" required>
+            <input type="text" id="pQtd" placeholder="Quantidade" required>
+            <input type="text" id="pTotal" placeholder="Valor Total (ex: 1200.00)" required>
             <button type="submit" class="btn-add">Registar Pedido</button>
         </form>
         <table>
@@ -125,8 +125,8 @@
         <form id="formProd">
             <input type="text" id="prNome" placeholder="Nome do Produto/Brinde" required>
             <input type="text" id="prCod" placeholder="Código / SKU">
-            <input type="number" id="prCusto" step="0.01" placeholder="Custo Estimado (R$)" required>
-            <input type="number" id="prVenda" step="0.01" placeholder="Preço Venda (R$)" required>
+            <input type="text" id="prCusto" placeholder="Custo Estimado (R$)" required>
+            <input type="text" id="prVenda" placeholder="Preço Venda (R$)" required>
             <button type="submit" class="btn-add">Cadastrar Produto</button>
         </form>
         <table>
@@ -140,8 +140,8 @@
         <h2>Stock de Materiais</h2>
         <form id="formMat">
             <input type="text" id="mNome" placeholder="Material (ex: Tinta, Plástico)" required>
-            <input type="number" id="mQtd" placeholder="Qtd em Stock" required>
-            <input type="number" id="mMin" placeholder="Stock Mínimo">
+            <input type="text" id="mQtd" placeholder="Qtd em Stock" required>
+            <input type="text" id="mMin" placeholder="Stock Mínimo">
             <input type="text" id="mForn" placeholder="Fornecedor / Obs">
             <button type="submit" class="btn-add">Adicionar Material</button>
         </form>
@@ -174,15 +174,16 @@
             evt.currentTarget.classList.add('active');
         }
 
-        let db = JSON.parse(localStorage.getItem('mls_sistema_v3')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
+        let db = JSON.parse(localStorage.getItem('mls_sistema_v4')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
 
-        function salvar() { localStorage.setItem('mls_sistema_v3', JSON.stringify(db)); }
+        function salvar() { localStorage.setItem('mls_sistema_v4', JSON.stringify(db)); }
 
         // Financeiro
         const formFin = document.getElementById('formFin');
         formFin.addEventListener('submit', e => {
             e.preventDefault();
-            db.fin.push({ tipo: document.getElementById('fTipo').value, desc: document.getElementById('fDesc').value, val: parseFloat(document.getElementById('fVal').value) });
+            const valLimpo = parseFloat(document.getElementById('fVal').value.replace(',', '.')) || 0;
+            db.fin.push({ tipo: document.getElementById('fTipo').value, desc: document.getElementById('fDesc').value, val: valLimpo });
             formFin.reset(); salvar(); renderFin();
         });
         function delFin(i) { db.fin.splice(i,1); salvar(); renderFin(); }
@@ -191,7 +192,26 @@
             let ent = 0, sai = 0;
             db.fin.forEach((item, i) => {
                 if(item.tipo==='Entrada') ent += item.val; else sai += item.val;
-                tb.innerHTML += `<tr><td style="color:${item.tipo==='Entrada'?'#2ec4b6':'#e71d36'}">${item.tipo}</td><td>${item.desc}</td><td>R$ ${item.val.toFixed(2)}</td><td><button class="btn-apagar" onclick="delFin(${i})">X</button></td></tr>`; }); document.getElementById('tEntradas').innerText = `R$ ${ent.toFixed(2)}`; document.getElementById('tSaidas').innerText = `R$ ${sai.toFixed(2)}`; document.getElementById('tSaldo').innerText = `R$ ${(ent-sai).toFixed(2)}`; }  // Cobranças (Pix & Boleto) let textoCobrançaGlobal = ''; let chavePixGlobal = ''; const formCob = document.getElementById('formCob'); formCob.addEventListener('submit', e => { e.preventDefault(); const cliente = document.getElementById('cCliente').value; const valor = parseFloat(document.getElementById('cValor').value).toFixed(2); chavePixGlobal = document.getElementById('cChavePix').value; const boleto = document.getElementById('cBoletoLink').value;  textoCobrançaGlobal = `Olá, ${cliente}!\n\n` +
+                tb.innerHTML += `<tr><td style="color:${item.tipo==='Entrada'?'#2ec4b6':'#e71d36'}">${item.tipo}</td><td>${item.desc}</td><td>R$ ${item.val.toFixed(2)}</td><td><button class="btn-apagar" onclick="delFin(${i})">X</button></td></tr>`;
+            });
+            document.getElementById('tEntradas').innerText = `R$ ${ent.toFixed(2)}`;
+            document.getElementById('tSaidas').innerText = `R$ ${sai.toFixed(2)}`;
+            document.getElementById('tSaldo').innerText = `R$ ${(ent-sai).toFixed(2)}`;
+        }
+
+        // Cobranças (Pix & Boleto)
+        let textoCobrançaGlobal = '';
+        let chavePixGlobal = '';
+        const formCob = document.getElementById('formCob');
+        formCob.addEventListener('submit', e => {
+            e.preventDefault();
+            const cliente = document.getElementById('cCliente').value;
+            const valorInput = document.getElementById('cValor').value.replace(',', '.');
+            const valor = parseFloat(valorInput || 0).toFixed(2);
+            chavePixGlobal = document.getElementById('cChavePix').value;
+            const boleto = document.getElementById('cBoletoLink').value;
+
+            textoCobrançaGlobal = `Olá, ${cliente}!\n\n` +
                 `Segue a cobrança da *MLS Brindes*:\n` +
                 `*Valor Total:* R$ ${valor}\n\n` +
                 `*Pagamento via Pix:*\nChave Pix: ${chavePixGlobal}\n\n` +
@@ -200,7 +220,6 @@
 
             document.getElementById('cobTextoResumo').innerText = textoCobrançaGlobal;
             
-            // Gera QR Code visual rápido usando API pública e segura
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(chavePixGlobal)}`;
             document.getElementById('qrCodeContainer').innerHTML = `<img src="${qrUrl}" alt="QR Code Pix">`;
             
@@ -221,7 +240,8 @@
         const formPed = document.getElementById('formPed');
         formPed.addEventListener('submit', e => {
             e.preventDefault();
-            db.ped.push({ cliente: document.getElementById('pCliente').value, brinde: document.getElementById('pBrinde').value, qtd: document.getElementById('pQtd').value, total: parseFloat(document.getElementById('pTotal').value) });
+            const totalLimpo = parseFloat(document.getElementById('pTotal').value.replace(',', '.')) || 0;
+            db.ped.push({ cliente: document.getElementById('pCliente').value, brinde: document.getElementById('pBrinde').value, qtd: document.getElementById('pQtd').value, total: totalLimpo });
             formPed.reset(); salvar(); renderPed();
         });
         function delPed(i) { db.ped.splice(i,1); salvar(); renderPed(); }
@@ -236,11 +256,13 @@
         const formProd = document.getElementById('formProd');
         formProd.addEventListener('submit', e => {
             e.preventDefault();
+            const custoLimpo = parseFloat(document.getElementById('prCusto').value.replace(',', '.')) || 0;
+            const vendaLimpa = parseFloat(document.getElementById('prVenda').value.replace(',', '.')) || 0;
             db.prod.push({ 
                 nome: document.getElementById('prNome').value, 
                 cod: document.getElementById('prCod').value || '-', 
-                custo: parseFloat(document.getElementById('prCusto').value),
-                venda: parseFloat(document.getElementById('prVenda').value)
+                custo: custoLimpo,
+                venda: vendaLimpa
             });
             formProd.reset(); salvar(); renderProd();
         });
@@ -248,4 +270,46 @@
         function renderProd() {
             let tb = document.getElementById('tbProd'); tb.innerHTML = '';
             db.prod.forEach((item, i) => {
-                tb.innerHTML += `<tr><td>${item.cod}</td><td>${item.nome}</td><td>R$ ${item.custo.toFixed(2)}</td><td>R$ ${item.venda.
+                tb.innerHTML += `<tr><td>${item.cod}</td><td>${item.nome}</td><td>R$ ${item.custo.toFixed(2)}</td><td>R$ ${item.venda.toFixed(2)}</td><td><button class="btn-apagar" onclick="delProd(${i})">X</button></td></tr>`;
+            });
+        }
+
+        // Materiais
+        const formMat = document.getElementById('formMat');
+        formMat.addEventListener('submit', e => {
+            e.preventDefault();
+            db.mat.push({ 
+                nome: document.getElementById('mNome').value, 
+                qtd: document.getElementById('mQtd').value, 
+                min: document.getElementById('mMin').value || '-', 
+                forn: document.getElementById('mForn').value || '-' 
+            });
+            formMat.reset(); salvar(); renderMat();
+        });
+        function delMat(i) { db.mat.splice(i,1); salvar(); renderMat(); }
+        function renderMat() {
+            let tb = document.getElementById('tbMat'); tb.innerHTML = '';
+            db.mat.forEach((item, i) => {
+                tb.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.min}</td><td>${item.forn}</td><td><button class="btn-apagar" onclick="delMat(${i})">X</button></td></tr>`;
+            });
+        }
+
+        // Equipa
+        const formEq = document.getElementById('formEq');
+        formEq.addEventListener('submit', e => {
+            e.preventDefault();
+            db.eq.push({ nome: document.getElementById('eNome').value, tarefa: document.getElementById('eTarefa').value, turno: document.getElementById('eTurno').value || '-' });
+            formEq.reset(); salvar(); renderEq();
+        });
+        function delEq(i) { db.eq.splice(i,1); salvar(); renderEq(); }
+        function renderEq() {
+            let tb = document.getElementById('tbEq'); tb.innerHTML = '';
+            db.eq.forEach((item, i) => {
+                tb.innerHTML += `<tr><td>${item.nome}</td><td>${item.tarefa}</td><td>${item.turno}</td><td><button class="btn-apagar" onclick="delEq(${i})">X</button></td></tr>`;
+            });
+        }
+
+        renderFin(); renderPed(); renderProd(); renderMat(); renderEq();
+    </script>
+</body>
+</html>
