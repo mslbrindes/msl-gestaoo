@@ -42,7 +42,7 @@
 
         /* Área de Cobrança e QR Code */
         .cobranca-box { background: #0b132b; border: 1px solid #3a506b; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; display: none; }
-        .cobranca-box img { margin: 15px 0; border: 4px solid #ffffff; border-radius: 8px; }
+        .cobranca-box img { margin: 15px 0; border: 4px solid #ffffff; border-radius: 8px; width: 180px; height: 180px; background: white; }
         .btn-copiar { background: #2ec4b6; color: white; font-weight: bold; padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 4px; border: none; }
         .btn-copiar:hover { background: #20a39e; }
     </style>
@@ -89,7 +89,6 @@
         <form id="formCob">
             <input type="text" id="cCliente" placeholder="Nome do Cliente" required>
             <input type="text" id="cValor" placeholder="Valor da Cobrança (ex: 350.00)" required>
-            <input type="text" id="cChavePix" placeholder="Sua Chave Pix (CNPJ, CPF ou E-mail)" value="66.501.064/0001-84" required>
             <input type="text" id="cBoletoLink" placeholder="Link do Boleto (opcional)">
             <button type="submit" class="btn-add">Gerar Pix & Resumo</button>
         </form>
@@ -167,6 +166,8 @@
     </div>
 
     <script>
+        const CHAVE_PIX_FIXA = "66.501.064/0001-84";
+
         function mudarModulo(id, evt) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -174,9 +175,9 @@
             evt.currentTarget.classList.add('active');
         }
 
-        let db = JSON.parse(localStorage.getItem('mls_sistema_v4')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
+        let db = JSON.parse(localStorage.getItem('mls_sistema_v5')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
 
-        function salvar() { localStorage.setItem('mls_sistema_v4', JSON.stringify(db)); }
+        function salvar() { localStorage.setItem('mls_sistema_v5', JSON.stringify(db)); }
 
         // Financeiro
         const formFin = document.getElementById('formFin');
@@ -201,26 +202,24 @@
 
         // Cobranças (Pix & Boleto)
         let textoCobrançaGlobal = '';
-        let chavePixGlobal = '';
         const formCob = document.getElementById('formCob');
         formCob.addEventListener('submit', e => {
             e.preventDefault();
             const cliente = document.getElementById('cCliente').value;
             const valorInput = document.getElementById('cValor').value.replace(',', '.');
             const valor = parseFloat(valorInput || 0).toFixed(2);
-            chavePixGlobal = document.getElementById('cChavePix').value;
             const boleto = document.getElementById('cBoletoLink').value;
 
             textoCobrançaGlobal = `Olá, ${cliente}!\n\n` +
                 `Segue a cobrança da *MLS Brindes*:\n` +
                 `*Valor Total:* R$ ${valor}\n\n` +
-                `*Pagamento via Pix:*\nChave Pix: ${chavePixGlobal}\n\n` +
+                `*Pagamento via Pix (CNPJ):*\n${CHAVE_PIX_FIXA}\n\n` +
                 (boleto ? `*Link do Boleto:* ${boleto}\n\n` : '') +
                 `Agradecemos a preferência!`;
 
             document.getElementById('cobTextoResumo').innerText = textoCobrançaGlobal;
             
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(chavePixGlobal)}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(CHAVE_PIX_FIXA)}`;
             document.getElementById('qrCodeContainer').innerHTML = `<img src="${qrUrl}" alt="QR Code Pix">`;
             
             document.getElementById('boxResultadoCobranca').style.display = 'block';
@@ -232,8 +231,8 @@
         }
 
         function copiarChavePix() {
-            navigator.clipboard.writeText(chavePixGlobal);
-            alert('Chave Pix copiada com sucesso!');
+            navigator.clipboard.writeText(CHAVE_PIX_FIXA);
+            alert('Chave Pix (CNPJ) copiada com sucesso!');
         }
 
         // Pedidos
