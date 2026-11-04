@@ -1,0 +1,13 @@
+{
+  "name": "mls-brindes-gestao",
+  "version": "1.0.0",
+  "description": "Sistema de Gestão MLS Brindes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
