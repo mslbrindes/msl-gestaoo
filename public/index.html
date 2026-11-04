@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLS Brindes - Sistema de Gestão</title>
+    <title>MLS Brindes - Sistema de Gestão Completo</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
         body { background-color: #0b132b; color: #ffffff; padding: 20px; }
@@ -12,24 +12,24 @@
         p { color: #8d99ae; }
 
         /* Abas de Navegação */
-        .tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
-        .tab-btn { background: #1c2541; color: #8d99ae; border: 1px solid #3a506b; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
+        .tab-btn { background: #1c2541; color: #8d99ae; border: 1px solid #3a506b; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .tab-btn.active, .tab-btn:hover { background: #ffb703; color: #0b132b; border-color: #ffb703; }
 
-        .module { display: none; max-width: 900px; margin: 0 auto; background: #1c2541; padding: 20px; border-radius: 8px; }
+        .module { display: none; max-width: 950px; margin: 0 auto; background: #1c2541; padding: 20px; border-radius: 8px; }
         .module.active { display: block; }
 
         h2 { font-size: 1.3rem; color: #ffb703; margin-bottom: 15px; }
 
         /* Formulários e Tabelas */
-        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        input, select, button { padding: 10px; border-radius: 4px; border: none; font-size: 1rem; }
+        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        input, select, button { padding: 10px; border-radius: 4px; border: none; font-size: 0.95rem; }
         input, select { background: #0b132b; color: #ffffff; border: 1px solid #3a506b; }
-        button.btn-add { background: #ffb703; color: #0b132b; font-weight: bold; cursor: pointer; grid-column: span 1; }
+        button.btn-add { background: #ffb703; color: #0b132b; font-weight: bold; cursor: pointer; }
         button.btn-add:hover { background: #fb8500; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a506b; font-size: 0.95rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #3a506b; font-size: 0.9rem; }
         th { color: #ffb703; }
         .btn-apagar { background: #e71d36; color: white; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; }
         .btn-apagar:hover { background: #d90429; }
@@ -45,14 +45,15 @@
 
     <header>
         <h1>MLS Brindes</h1>
-        <p>Painel de Gestão Operacional e Financeiro</p>
+        <p>Painel Integrado de Gestão Operacional e Financeira</p>
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="mudarModulo('financeiro')">Financeiro</button>
-        <button class="tab-btn" onclick="mudarModulo('pedidos')">Pedidos & Orçamentos</button>
-        <button class="tab-btn" onclick="mudarModulo('materiais')">Stock de Materiais</button>
-        <button class="tab-btn" onclick="mudarModulo('equipa')">Escala da Equipa</button>
+        <button class="tab-btn active" onclick="mudarModulo('financeiro', event)">Financeiro</button>
+        <button class="tab-btn" onclick="mudarModulo('pedidos', event)">Pedidos & Orçamentos</button>
+        <button class="tab-btn" onclick="mudarModulo('produtos', event)">Cadastro de Produtos</button>
+        <button class="tab-btn" onclick="mudarModulo('materiais', event)">Stock de Materiais</button>
+        <button class="tab-btn" onclick="mudarModulo('equipa', event)">Escala da Equipa</button>
     </div>
 
     <!-- MÓDULO FINANCEIRO -->
@@ -67,7 +68,7 @@
             <select id="fTipo"><option value="Entrada">Entrada</option><option value="Saída">Saída</option></select>
             <input type="text" id="fDesc" placeholder="Descrição" required>
             <input type="number" id="fVal" step="0.01" placeholder="Valor (R$)" required>
-            <button type="sub" class="btn-add">Adicionar</button>
+            <button type="submit" class="btn-add">Adicionar</button>
         </form>
         <table>
             <thead><tr><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Ações</th></tr></thead>
@@ -83,7 +84,7 @@
             <input type="text" id="pBrinde" placeholder="Descrição do Brinde" required>
             <input type="number" id="pQtd" placeholder="Quantidade" required>
             <input type="number" id="pTotal" step="0.01" placeholder="Valor Total (R$)" required>
-            <button type="sub" class="btn-add">Registar Pedido</button>
+            <button type="submit" class="btn-add">Registar Pedido</button>
         </form>
         <table>
             <thead><tr><th>Cliente</th><th>Brinde</th><th>Qtd</th><th>Total</th><th>Ações</th></tr></thead>
@@ -91,17 +92,34 @@
         </table>
     </div>
 
-    <!-- MÓDULO MATERIAIS -->
-    <div id="materiais" class="module">
-        <h2>Gestão de Stock / Materiais</h2>
-        <form id="formMat">
-            <input type="text" id="mNome" placeholder="Nome do Material" required>
-            <input type="number" id="mQtd" placeholder="Quantidade em Stock" required>
-            <input type="text" id="mMin" placeholder="Fornecedor / Observação">
-            <button type="sub" class="btn-add">Adicionar Material</button>
+    <!-- MÓDULO CADASTRO DE PRODUTOS -->
+    <div id="produtos" class="module">
+        <h2>Cadastro de Produtos (Brindes Prontos)</h2>
+        <form id="formProd">
+            <input type="text" id="prNome" placeholder="Nome do Produto/Brinde" required>
+            <input type="text" id="prCod" placeholder="Código / SKU">
+            <input type="number" id="prCusto" step="0.01" placeholder="Custo Estimado (R$)" required>
+            <input type="number" id="prVenda" step="0.01" placeholder="Preço Venda (R$)" required>
+            <button type="submit" class="btn-add">Cadastrar Produto</button>
         </form>
         <table>
-            <thead><tr><th>Material</th><th>Quantidade</th><th>Observação</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Código</th><th>Produto</th><th>Custo Unit.</th><th>Preço Venda</th><th>Ações</th></tr></thead>
+            <tbody id="tbProd"></tbody>
+        </table>
+    </div>
+
+    <!-- MÓDULO MATERIAIS / MATÉRIAS-PRIMAS -->
+    <div id="materiais" class="module">
+        <h2>Gestão de Materiais e Matérias-Primas</h2>
+        <form id="formMat">
+            <input type="text" id="mNome" placeholder="Material (ex: Tinta, Plástico)" required>
+            <input type="number" id="mQtd" placeholder="Qtd em Stock" required>
+            <input type="number" id="mMin" placeholder="Stock Mínimo">
+            <input type="text" id="mForn" placeholder="Fornecedor / Obs">
+            <button type="submit" class="btn-add">Adicionar Material</button>
+        </form>
+        <table>
+            <thead><tr><th>Material</th><th>Stock Atual</th><th>Stock Mín.</th><th>Fornecedor</th><th>Ações</th></tr></thead>
             <tbody id="tbMat"></tbody>
         </table>
     </div>
@@ -113,7 +131,7 @@
             <input type="text" id="eNome" placeholder="Nome da Funcionária" required>
             <input type="text" id="eTarefa" placeholder="Tarefa / Posto Atribuído" required>
             <input type="text" id="eTurno" placeholder="Turno / Horário">
-            <button type="sub" class="btn-add">Atribuir Tarefa</button>
+            <button type="submit" class="btn-add">Atribuir Tarefa</button>
         </form>
         <table>
             <thead><tr><th>Funcionária</th><th>Tarefa</th><th>Turno</th><th>Ações</th></tr></thead>
@@ -122,17 +140,17 @@
     </div>
 
     <script>
-        function mudarModulo(id) {
+        function mudarModulo(id, evt) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            event.currentTarget.classList.add('active');
+            evt.currentTarget.classList.add('active');
         }
 
         // --- SISTEMA DE DADOS (LocalStorage) ---
-        let db = JSON.parse(localStorage.getItem('mls_sistema')) || { fin: [], ped: [], mat: [], eq: [] };
+        let db = JSON.parse(localStorage.getItem('mls_sistema_v2')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
 
-        function salvar() { localStorage.setItem('mls_sistema', JSON.stringify(db)); }
+        function salvar() { localStorage.setItem('mls_sistema_v2', JSON.stringify(db)); }
 
         // Financeiro
         const formFin = document.getElementById('formFin');
@@ -169,18 +187,43 @@
             });
         }
 
+        // Produtos
+        const formProd = document.getElementById('formProd');
+        formProd.addEventListener('submit', e => {
+            e.preventDefault();
+            db.prod.push({ 
+                nome: document.getElementById('prNome').value, 
+                cod: document.getElementById('prCod').value || '-', 
+                custo: parseFloat(document.getElementById('prCusto').value),
+                venda: parseFloat(document.getElementById('prVenda').value)
+            });
+            formProd.reset(); salvar(); renderProd();
+        });
+        function delProd(i) { db.prod.splice(i,1); salvar(); renderProd(); }
+        function renderProd() {
+            let tb = document.getElementById('tbProd'); tb.innerHTML = '';
+            db.prod.forEach((item, i) => {
+                tb.innerHTML += `<tr><td>${item.cod}</td><td>${item.nome}</td><td>R$ ${item.custo.toFixed(2)}</td><td>R$ ${item.venda.toFixed(2)}</td><td><button class="btn-apagar" onclick="delProd(${i})">X</button></td></tr>`;
+            });
+        }
+
         // Materiais
         const formMat = document.getElementById('formMat');
         formMat.addEventListener('submit', e => {
             e.preventDefault();
-            db.mat.push({ nome: document.getElementById('mNome').value, qtd: document.getElementById('mQtd').value, min: document.getElementById('mMin').value });
+            db.mat.push({ 
+                nome: document.getElementById('mNome').value, 
+                qtd: document.getElementById('mQtd').value, 
+                min: document.getElementById('mMin').value || '-', 
+                forn: document.getElementById('mForn').value || '-' 
+            });
             formMat.reset(); salvar(); renderMat();
         });
         function delMat(i) { db.mat.splice(i,1); salvar(); renderMat(); }
         function renderMat() {
             let tb = document.getElementById('tbMat'); tb.innerHTML = '';
             db.mat.forEach((item, i) => {
-                tb.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.min}</td><td><button class="btn-apagar" onclick="delMat(${i})">X</button></td></tr>`;
+                tb.innerHTML += `<tr><td>${item.nome}</td><td>${item.qtd}</td><td>${item.min}</td><td>${item.forn}</td><td><button class="btn-apagar" onclick="delMat(${i})">X</button></td></tr>`;
             });
         }
 
@@ -188,7 +231,7 @@
         const formEq = document.getElementById('formEq');
         formEq.addEventListener('submit', e => {
             e.preventDefault();
-            db.eq.push({ nome: document.getElementById('eNome').value, tarefa: document.getElementById('eTarefa').value, turno: document.getElementById('eTurno').value });
+            db.eq.push({ nome: document.getElementById('eNome').value, tarefa: document.getElementById('eTarefa').value, turno: document.getElementById('eTurno').value || '-' });
             formEq.reset(); salvar(); renderEq();
         });
         function delEq(i) { db.eq.splice(i,1); salvar(); renderEq(); }
@@ -199,8 +242,8 @@
             });
         }
 
-        // Inicializar dados na tela
-        renderFin(); renderPed(); renderMat(); renderEq();
+        // Carregar listas ao abrir
+        renderFin(); renderPed(); renderProd(); renderMat(); renderEq();
     </script>
 </body>
 </html>
