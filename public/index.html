@@ -40,10 +40,9 @@
         .card h3 { font-size: 0.9rem; color: #8d99ae; margin-bottom: 5px; }
         .card p { font-size: 1.3rem; font-weight: bold; color: #ffffff; }
 
-        /* Área de Cobrança e QR Code */
+        /* Área de Cobrança */
         .cobranca-box { background: #0b132b; border: 1px solid #3a506b; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; display: none; }
-        .cobranca-box img { margin: 15px 0; border: 4px solid #ffffff; border-radius: 8px; width: 180px; height: 180px; background: white; }
-        .btn-copiar { background: #2ec4b6; color: white; font-weight: bold; padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 4px; border: none; }
+        .btn-copiar { background: #2ec4b6; color: white; font-weight: bold; padding: 10px 18px; margin: 8px; cursor: pointer; border-radius: 4px; border: none; display: inline-block; }
         .btn-copiar:hover { background: #20a39e; }
     </style>
 </head>
@@ -83,22 +82,23 @@
         </table>
     </div>
 
-    <!-- MÓDULO GERAR COBRANÇA (PIX E BOLETO) -->
+    <!-- MÓDULO GERAR COBRANÇA -->
     <div id="cobrança" class="module">
         <h2>Gerador de Cobrança (Pix & Boleto)</h2>
         <form id="formCob">
             <input type="text" id="cCliente" placeholder="Nome do Cliente" required>
             <input type="text" id="cValor" placeholder="Valor da Cobrança (ex: 350.00)" required>
             <input type="text" id="cBoletoLink" placeholder="Link do Boleto (opcional)">
-            <button type="submit" class="btn-add">Gerar Pix & Resumo</button>
+            <button type="submit" class="btn-add">Gerar Cobrança</button>
         </form>
 
         <div id="boxResultadoCobranca" class="cobranca-box">
             <h3 style="color: #ffb703;">Cobrança Pronta para Envio</h3>
-            <p id="cobTextoResumo" style="margin-top: 10px; color: #ffffff; text-align: left; background: #1c2541; padding: 10px; border-radius: 4px; white-space: pre-line;"></p>
-            <div id="qrCodeContainer"></div>
-            <button class="btn-copiar" onclick="copiarTextoCobranca()">Copiar Mensagem p/ WhatsApp</button>
-            <button class="btn-copiar" style="background:#ffb703; color:#0b132b;" onclick="copiarChavePix()">Copiar Chave Pix</button>
+            <p id="cobTextoResumo" style="margin-top: 10px; color: #ffffff; text-align: left; background: #1c2541; padding: 15px; border-radius: 4px; white-space: pre-line;"></p>
+            <div>
+                <button class="btn-copiar" onclick="copiarTextoCobranca()">Copiar Mensagem p/ WhatsApp</button>
+                <button class="btn-copiar" style="background:#ffb703; color:#0b132b;" onclick="copiarChavePix()">Copiar Chave Pix (CNPJ)</button>
+            </div>
         </div>
     </div>
 
@@ -166,7 +166,8 @@
     </div>
 
     <script>
-        const CHAVE_PIX_FIXA = "66.501.064/0001-84";
+        const CHAVE_PIX_FIXA = "66501064000184";
+        const CHAVE_PIX_FORMATADA = "66.501.064/0001-84";
 
         function mudarModulo(id, evt) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
@@ -175,9 +176,9 @@
             evt.currentTarget.classList.add('active');
         }
 
-        let db = JSON.parse(localStorage.getItem('mls_sistema_v5')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
+        let db = JSON.parse(localStorage.getItem('mls_sistema_v6')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
 
-        function salvar() { localStorage.setItem('mls_sistema_v5', JSON.stringify(db)); }
+        function salvar() { localStorage.setItem('mls_sistema_v6', JSON.stringify(db)); }
 
         // Financeiro
         const formFin = document.getElementById('formFin');
@@ -200,7 +201,7 @@
             document.getElementById('tSaldo').innerText = `R$ ${(ent-sai).toFixed(2)}`;
         }
 
-        // Cobranças (Pix & Boleto)
+        // Cobranças
         let textoCobrançaGlobal = '';
         const formCob = document.getElementById('formCob');
         formCob.addEventListener('submit', e => {
@@ -213,15 +214,11 @@
             textoCobrançaGlobal = `Olá, ${cliente}!\n\n` +
                 `Segue a cobrança da *MLS Brindes*:\n` +
                 `*Valor Total:* R$ ${valor}\n\n` +
-                `*Pagamento via Pix (CNPJ):*\n${CHAVE_PIX_FIXA}\n\n` +
+                `*Pagamento via Pix (CNPJ):*\n${CHAVE_PIX_FORMATADA}\n\n` +
                 (boleto ? `*Link do Boleto:* ${boleto}\n\n` : '') +
                 `Agradecemos a preferência!`;
 
             document.getElementById('cobTextoResumo').innerText = textoCobrançaGlobal;
-            
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(CHAVE_PIX_FIXA)}`;
-            document.getElementById('qrCodeContainer').innerHTML = `<img src="${qrUrl}" alt="QR Code Pix">`;
-            
             document.getElementById('boxResultadoCobranca').style.display = 'block';
         });
 
