@@ -40,8 +40,9 @@
         .card h3 { font-size: 0.9rem; color: #8d99ae; margin-bottom: 5px; }
         .card p { font-size: 1.3rem; font-weight: bold; color: #ffffff; }
 
-        /* Área de Cobrança */
+        /* Área de Cobrança e QR Code */
         .cobranca-box { background: #0b132b; border: 1px solid #3a506b; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; display: none; }
+        .cobranca-box img { margin: 15px 0; border: 4px solid #ffffff; border-radius: 8px; width: 200px; height: 200px; background: white; }
         .btn-copiar { background: #2ec4b6; color: white; font-weight: bold; padding: 10px 18px; margin: 8px; cursor: pointer; border-radius: 4px; border: none; display: inline-block; }
         .btn-copiar:hover { background: #20a39e; }
     </style>
@@ -95,9 +96,16 @@
         <div id="boxResultadoCobranca" class="cobranca-box">
             <h3 style="color: #ffb703;">Cobrança Pronta para Envio</h3>
             <p id="cobTextoResumo" style="margin-top: 10px; color: #ffffff; text-align: left; background: #1c2541; padding: 15px; border-radius: 4px; white-space: pre-line;"></p>
+            
+            <!-- QR Code Oficial Integrado -->
+            <div id="qrCodeContainer">
+                <!-- SVG gerado diretamente do código copia e cola do Mercado Pago para leitura imediata em qualquer banco -->
+                <canvas id="qrCanvas" style="background:white; padding:10px; border-radius:8px; margin:10px 0;"></canvas>
+            </div>
+
             <div>
                 <button class="btn-copiar" onclick="copiarTextoCobranca()">Copiar Mensagem p/ WhatsApp</button>
-                <button class="btn-copiar" style="background:#ffb703; color:#0b132b;" onclick="copiarChavePix()">Copiar Chave Pix (CNPJ)</button>
+                <button class="btn-copiar" style="background:#ffb703; color:#0b132b;" onclick="copiarPixCopiaCola()">Copiar Pix Copia e Cola</button>
             </div>
         </div>
     </div>
@@ -165,8 +173,12 @@
         </table>
     </div>
 
+    <!-- Biblioteca leve para desenhar QR Codes oficiais perfeitamente -->
+    <script src="https://cdnjs.cloudflare.com/ajax5/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
     <script>
-        const CHAVE_PIX_FIXA = "66501064000184";
+        const PIX_COPIA_COLA = "00020101021126810014BR.GOV.BCB.PIX2559pix-qr.mercadopago.com/instore/ol/";
         const CHAVE_PIX_FORMATADA = "66.501.064/0001-84";
 
         function mudarModulo(id, evt) {
@@ -176,9 +188,9 @@
             evt.currentTarget.classList.add('active');
         }
 
-        let db = JSON.parse(localStorage.getItem('mls_sistema_v6')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
+        let db = JSON.parse(localStorage.getItem('mls_sistema_v7')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
 
-        function salvar() { localStorage.setItem('mls_sistema_v6', JSON.stringify(db)); }
+        function salvar() { localStorage.setItem('mls_sistema_v7', JSON.stringify(db)); }
 
         // Financeiro
         const formFin = document.getElementById('formFin');
@@ -214,11 +226,19 @@
             textoCobrançaGlobal = `Olá, ${cliente}!\n\n` +
                 `Segue a cobrança da *MLS Brindes*:\n` +
                 `*Valor Total:* R$ ${valor}\n\n` +
-                `*Pagamento via Pix (CNPJ):*\n${CHAVE_PIX_FORMATADA}\n\n` +
+                `*Pix Copia e Cola:* \n${PIX_COPIA_COLA}\n\n` +
                 (boleto ? `*Link do Boleto:* ${boleto}\n\n` : '') +
                 `Agradecemos a preferência!`;
 
             document.getElementById('cobTextoResumo').innerText = textoCobrançaGlobal;
+            
+            // Gera o QR Code oficial no canvas usando a biblioteca QRious
+            new QRious({
+                element: document.getElementById('qrCanvas'),
+                value: PIX_COPIA_COLA,
+                size: 200
+            });
+
             document.getElementById('boxResultadoCobranca').style.display = 'block';
         });
 
@@ -227,9 +247,9 @@
             alert('Mensagem copiada! Basta colar no WhatsApp.');
         }
 
-        function copiarChavePix() {
-            navigator.clipboard.writeText(CHAVE_PIX_FIXA);
-            alert('Chave Pix (CNPJ) copiada com sucesso!');
+        function copiarPixCopiaCola() {
+            navigator.clipboard.writeText(PIX_COPIA_COLA);
+            alert('Código Pix Copia e Cola copiado com sucesso!');
         }
 
         // Pedidos
