@@ -170,12 +170,11 @@
         </table>
     </div>
 
-    <!-- Biblioteca para desenho nativo do QR Code do Mercado Pago -->
+    <!-- Biblioteca para desenho do QR Code oficial -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
     <script>
         const PIX_COPIA_COLA = "00020101021126810014BR.GOV.BCB.PIX2559pix-qr.mercadopago.com/instore/ol/74191340/e33d-4952-b9cf-2ed0398f82f2?PIND=0";
-        const CNPJ_EMPRESA = "66.501.064/0001-84";
 
         function mudarModulo(id, evt) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
@@ -184,9 +183,9 @@
             evt.currentTarget.classList.add('active');
         }
 
-        let db = JSON.parse(localStorage.getItem('mls_sistema_v9')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
+        let db = JSON.parse(localStorage.getItem('mls_sistema_v10')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
 
-        function salvar() { localStorage.setItem('mls_sistema_v9', JSON.stringify(db)); }
+        function salvar() { localStorage.setItem('mls_sistema_v10', JSON.stringify(db)); }
 
         // Financeiro
         const formFin = document.getElementById('formFin');
@@ -228,7 +227,6 @@
 
             document.getElementById('cobTextoResumo').innerText = textoCobrançaGlobal;
             
-            // Renderiza o QR Code oficial extraído do documento do banco
             new QRious({
                 element: document.getElementById('qrCanvas'),
                 value: PIX_COPIA_COLA,
@@ -308,7 +306,8 @@
 
         // Equipa
         const formEq = document.getElementById('formEq');
-        formEq.addEventListener('submit', e =>.preventDefault();
+        formEq.addEventListener('submit', e => {
+            e.preventDefault();
             db.eq.push({ nome: document.getElementById('eNome').value, tarefa: document.getElementById('eTarefa').value, turno: document.getElementById('eTurno').value || '-' });
             formEq.reset(); salvar(); renderEq();
         });
