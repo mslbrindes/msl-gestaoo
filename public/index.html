@@ -42,7 +42,6 @@
 
         /* Área de Cobrança e QR Code */
         .cobranca-box { background: #0b132b; border: 1px solid #3a506b; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; display: none; }
-        .cobranca-box img { margin: 15px 0; border: 4px solid #ffffff; border-radius: 8px; width: 200px; height: 200px; background: white; }
         .btn-copiar { background: #2ec4b6; color: white; font-weight: bold; padding: 10px 18px; margin: 8px; cursor: pointer; border-radius: 4px; border: none; display: inline-block; }
         .btn-copiar:hover { background: #20a39e; }
     </style>
@@ -97,10 +96,8 @@
             <h3 style="color: #ffb703;">Cobrança Pronta para Envio</h3>
             <p id="cobTextoResumo" style="margin-top: 10px; color: #ffffff; text-align: left; background: #1c2541; padding: 15px; border-radius: 4px; white-space: pre-line;"></p>
             
-            <!-- QR Code Oficial Integrado -->
             <div id="qrCodeContainer">
-                <!-- SVG gerado diretamente do código copia e cola do Mercado Pago para leitura imediata em qualquer banco -->
-                <canvas id="qrCanvas" style="background:white; padding:10px; border-radius:8px; margin:10px 0;"></canvas>
+                <canvas id="qrCanvas" style="background:white; padding:10px; border-radius:8px; margin:15px 0;"></canvas>
             </div>
 
             <div>
@@ -173,13 +170,12 @@
         </table>
     </div>
 
-    <!-- Biblioteca leve para desenhar QR Codes oficiais perfeitamente -->
-    <script src="https://cdnjs.cloudflare.com/ajax5/libs/qrious/4.0.2/qrious.min.js"></script>
+    <!-- Biblioteca para desenho nativo do QR Code do Mercado Pago -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
     <script>
-        const PIX_COPIA_COLA = "00020101021126810014BR.GOV.BCB.PIX2559pix-qr.mercadopago.com/instore/ol/";
-        const CHAVE_PIX_FORMATADA = "66.501.064/0001-84";
+        const PIX_COPIA_COLA = "00020101021126810014BR.GOV.BCB.PIX2559pix-qr.mercadopago.com/instore/ol/74191340/e33d-4952-b9cf-2ed0398f82f2?PIND=0";
+        const CNPJ_EMPRESA = "66.501.064/0001-84";
 
         function mudarModulo(id, evt) {
             document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
@@ -188,9 +184,9 @@
             evt.currentTarget.classList.add('active');
         }
 
-        let db = JSON.parse(localStorage.getItem('mls_sistema_v7')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
+        let db = JSON.parse(localStorage.getItem('mls_sistema_v9')) || { fin: [], ped: [], prod: [], mat: [], eq: [] };
 
-        function salvar() { localStorage.setItem('mls_sistema_v7', JSON.stringify(db)); }
+        function salvar() { localStorage.setItem('mls_sistema_v9', JSON.stringify(db)); }
 
         // Financeiro
         const formFin = document.getElementById('formFin');
@@ -232,7 +228,7 @@
 
             document.getElementById('cobTextoResumo').innerText = textoCobrançaGlobal;
             
-            // Gera o QR Code oficial no canvas usando a biblioteca QRious
+            // Renderiza o QR Code oficial extraído do documento do banco
             new QRious({
                 element: document.getElementById('qrCanvas'),
                 value: PIX_COPIA_COLA,
@@ -312,8 +308,7 @@
 
         // Equipa
         const formEq = document.getElementById('formEq');
-        formEq.addEventListener('submit', e => {
-            e.preventDefault();
+        formEq.addEventListener('submit', e =>.preventDefault();
             db.eq.push({ nome: document.getElementById('eNome').value, tarefa: document.getElementById('eTarefa').value, turno: document.getElementById('eTurno').value || '-' });
             formEq.reset(); salvar(); renderEq();
         });
